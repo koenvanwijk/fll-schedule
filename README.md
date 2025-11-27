@@ -328,8 +328,11 @@ De scheduler gebruikt **Constraint Programming** (CP-SAT solver van Google OR-To
 - Tafel paren: beide tafels van een paar tegelijk gebruiken (of beide leeg)
 
 **Prioriteit 2:**
-- Minimaliseer aantal verschillende tafels per team
-- Bij voorkeur speelt elk team op dezelfde tafel
+- Maximaliseer aantal verschillende tafels per team
+- Teams spelen bij voorkeur op verschillende tafels voor maximale tegenstander variatie
+
+**Prioriteit 3:**
+- Teams spelen maximaal 1x tegen dezelfde tegenstander
 
 **Jury rondes:**
 - Jury sessies starten in gesynchroniseerde rondes
