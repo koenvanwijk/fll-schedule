@@ -40,6 +40,7 @@ jobs:
         NUM_JURY=$(echo "$BODY" | grep -oP '(?<=\*\*Jury Rooms:\*\* )\d+' || echo "8")
         MATCHES=$(echo "$BODY" | grep -oP '(?<=\*\*Wedstrijden per team:\*\* )\d+' || echo "4")
         TIMESLOTS=$(echo "$BODY" | grep -oP '(?<=\*\*Tijdsloten:\*\* )\d+' || echo "40")
+        START_TIME=$(echo "$BODY" | grep -oP '(?<=\*\*Start tijd:\*\* )\d{2}:\d{2}' || echo "09:30")
         MATCH_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Wedstrijd duur:\*\* )\d+' || echo "7")
         JURY_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Jury duur:\*\* )\d+' || echo "42")
         BUFFER=$(echo "$BODY" | grep -oP '(?<=\*\*Buffer tijd:\*\* )\d+' || echo "30")
@@ -50,6 +51,7 @@ jobs:
         echo "num_jury_rooms=$NUM_JURY" >> $GITHUB_OUTPUT
         echo "matches_per_team=$MATCHES" >> $GITHUB_OUTPUT
         echo "num_timeslots=$TIMESLOTS" >> $GITHUB_OUTPUT
+        echo "start_time=$START_TIME" >> $GITHUB_OUTPUT
         echo "match_duration=$MATCH_DUR" >> $GITHUB_OUTPUT
         echo "jury_duration=$JURY_DUR" >> $GITHUB_OUTPUT
         echo "buffer_time=$BUFFER" >> $GITHUB_OUTPUT
@@ -61,6 +63,7 @@ jobs:
         echo "Jury: $NUM_JURY"
         echo "Matches: $MATCHES"
         echo "Timeslots: $TIMESLOTS"
+        echo "Start Time: $START_TIME"
         echo "Match Duration: $MATCH_DUR"
         echo "Jury Duration: $JURY_DUR"
         echo "Buffer: $BUFFER"
@@ -96,6 +99,7 @@ jobs:
           --num-jury-rooms "${{ steps.params.outputs.num_jury_rooms }}" \
           --matches-per-team "${{ steps.params.outputs.matches_per_team }}" \
           --num-timeslots "${{ steps.params.outputs.num_timeslots }}" \
+          --start-time "${{ steps.params.outputs.start_time }}" \
           --match-duration "${{ steps.params.outputs.match_duration }}" \
           --jury-duration "${{ steps.params.outputs.jury_duration }}" \
           --buffer-time "${{ steps.params.outputs.buffer_time }}" \

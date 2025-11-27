@@ -12,6 +12,7 @@ def main():
     parser.add_argument('--num-jury-rooms', type=int, help='Aantal jury rooms (4-10)')
     parser.add_argument('--matches-per-team', type=int, help='Wedstrijden per team')
     parser.add_argument('--num-timeslots', type=int, help='Aantal tijdsloten')
+    parser.add_argument('--start-time', type=str, help='Start tijd toernooi (HH:MM)')
     parser.add_argument('--match-duration', type=int, help='Wedstrijd duur in minuten')
     parser.add_argument('--jury-duration', type=int, help='Jury sessie duur in minuten')
     parser.add_argument('--buffer-time', type=int, help='Buffer tijd tussen activiteiten')
@@ -32,6 +33,8 @@ def main():
         config.MATCHES_PER_TEAM = args.matches_per_team
     if args.num_timeslots is not None:
         config.NUM_TIMESLOTS = args.num_timeslots
+    if args.start_time is not None:
+        config.START_TIME = args.start_time
     if args.match_duration is not None:
         config.MATCH_DURATION = args.match_duration
     if args.jury_duration is not None:
