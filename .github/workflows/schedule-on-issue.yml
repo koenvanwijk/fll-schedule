@@ -40,12 +40,20 @@ jobs:
         NUM_JURY=$(echo "$BODY" | grep -oP '(?<=\*\*Jury Rooms:\*\* )\d+' || echo "8")
         MATCHES=$(echo "$BODY" | grep -oP '(?<=\*\*Wedstrijden per team:\*\* )\d+' || echo "4")
         TIMESLOTS=$(echo "$BODY" | grep -oP '(?<=\*\*Tijdsloten:\*\* )\d+' || echo "40")
+        MATCH_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Wedstrijd duur:\*\* )\d+' || echo "7")
+        JURY_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Jury duur:\*\* )\d+' || echo "42")
+        BUFFER=$(echo "$BODY" | grep -oP '(?<=\*\*Buffer tijd:\*\* )\d+' || echo "30")
+        BREAK=$(echo "$BODY" | grep -oP '(?<=\*\*Pauze:\*\* )(Ja|Nee)' || echo "Ja")
         
         echo "num_teams=$NUM_TEAMS" >> $GITHUB_OUTPUT
         echo "num_tables=$NUM_TABLES" >> $GITHUB_OUTPUT
         echo "num_jury_rooms=$NUM_JURY" >> $GITHUB_OUTPUT
         echo "matches_per_team=$MATCHES" >> $GITHUB_OUTPUT
         echo "num_timeslots=$TIMESLOTS" >> $GITHUB_OUTPUT
+        echo "match_duration=$MATCH_DUR" >> $GITHUB_OUTPUT
+        echo "jury_duration=$JURY_DUR" >> $GITHUB_OUTPUT
+        echo "buffer_time=$BUFFER" >> $GITHUB_OUTPUT
+        echo "break_enabled=$BREAK" >> $GITHUB_OUTPUT
         
         echo "Parsed parameters:"
         echo "Teams: $NUM_TEAMS"
@@ -53,6 +61,10 @@ jobs:
         echo "Jury: $NUM_JURY"
         echo "Matches: $MATCHES"
         echo "Timeslots: $TIMESLOTS"
+        echo "Match Duration: $MATCH_DUR"
+        echo "Jury Duration: $JURY_DUR"
+        echo "Buffer: $BUFFER"
+        echo "Break: $BREAK"
     
     - name: Add comment - Starting
       uses: actions/github-script@v7
@@ -83,7 +95,11 @@ jobs:
           --num-tables "${{ steps.params.outputs.num_tables }}" \
           --num-jury-rooms "${{ steps.params.outputs.num_jury_rooms }}" \
           --matches-per-team "${{ steps.params.outputs.matches_per_team }}" \
-          --num-timeslots "${{ steps.params.outputs.num_timeslots }}"
+          --num-timeslots "${{ steps.params.outputs.num_timeslots }}" \
+          --match-duration "${{ steps.params.outputs.match_duration }}" \
+          --jury-duration "${{ steps.params.outputs.jury_duration }}" \
+          --buffer-time "${{ steps.params.outputs.buffer_time }}" \
+          --break-enabled "${{ steps.params.outputs.break_enabled }}"
       continue-on-error: true
     
     - name: Find generated schedule

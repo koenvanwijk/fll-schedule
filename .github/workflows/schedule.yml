@@ -32,6 +32,29 @@ on:
         required: true
         default: '40'
         type: string
+      match_duration:
+        description: 'Wedstrijd duur (minuten)'
+        required: true
+        default: '7'
+        type: string
+      jury_duration:
+        description: 'Jury sessie duur (minuten)'
+        required: true
+        default: '42'
+        type: string
+      buffer_time:
+        description: 'Minimale buffer tijd (minuten)'
+        required: true
+        default: '30'
+        type: string
+      break_enabled:
+        description: 'Pauze inschakelen (Ja/Nee)'
+        required: true
+        default: 'Ja'
+        type: choice
+        options:
+          - 'Ja'
+          - 'Nee'
 
 jobs:
   generate-and-test:
@@ -58,7 +81,11 @@ jobs:
           --num-tables "${{ github.event.inputs.num_tables || '6' }}" \
           --num-jury-rooms "${{ github.event.inputs.num_jury_rooms || '8' }}" \
           --matches-per-team "${{ github.event.inputs.matches_per_team || '4' }}" \
-          --num-timeslots "${{ github.event.inputs.num_timeslots || '40' }}"
+          --num-timeslots "${{ github.event.inputs.num_timeslots || '40' }}" \
+          --match-duration "${{ github.event.inputs.match_duration || '7' }}" \
+          --jury-duration "${{ github.event.inputs.jury_duration || '42' }}" \
+          --buffer-time "${{ github.event.inputs.buffer_time || '30' }}" \
+          --break-enabled "${{ github.event.inputs.break_enabled || 'Ja' }}"
       continue-on-error: false
     
     - name: Find generated schedule

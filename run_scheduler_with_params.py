@@ -12,6 +12,10 @@ def main():
     parser.add_argument('--num-jury-rooms', type=int, help='Aantal jury rooms (4-10)')
     parser.add_argument('--matches-per-team', type=int, help='Wedstrijden per team')
     parser.add_argument('--num-timeslots', type=int, help='Aantal tijdsloten')
+    parser.add_argument('--match-duration', type=int, help='Wedstrijd duur in minuten')
+    parser.add_argument('--jury-duration', type=int, help='Jury sessie duur in minuten')
+    parser.add_argument('--buffer-time', type=int, help='Buffer tijd tussen activiteiten')
+    parser.add_argument('--break-enabled', type=str, help='Pauze inschakelen (Ja/Nee)')
     
     args = parser.parse_args()
     
@@ -28,6 +32,14 @@ def main():
         config.MATCHES_PER_TEAM = args.matches_per_team
     if args.num_timeslots is not None:
         config.NUM_TIMESLOTS = args.num_timeslots
+    if args.match_duration is not None:
+        config.MATCH_DURATION = args.match_duration
+    if args.jury_duration is not None:
+        config.JURY_DURATION = args.jury_duration
+    if args.buffer_time is not None:
+        config.MINIMUM_BUFFER_TIME = args.buffer_time
+    if args.break_enabled is not None:
+        config.BREAK_ENABLED = args.break_enabled.lower() in ['ja', 'yes', 'true', '1']
     
     # Now run the scheduler
     from complete_scheduler import create_complete_schedule, build_json_output, print_summary, save_json

@@ -52,6 +52,22 @@
             font-weight: 500;
         }
         
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: white;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
         input {
             width: 100%;
             padding: 12px;
@@ -181,6 +197,33 @@
                 <label for="numTimeslots">Aantal Tijdsloten</label>
                 <input type="number" id="numTimeslots" name="numTimeslots" min="20" max="100" value="40" required>
                 <div class="helper-text">Verhoog dit als er geen oplossing gevonden wordt</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="matchDuration">Wedstrijd Duur (minuten)</label>
+                <input type="number" id="matchDuration" name="matchDuration" min="5" max="15" value="7" required>
+                <div class="helper-text">Standaard 7 minuten voor FLL</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="juryDuration">Jury Sessie Duur (minuten)</label>
+                <input type="number" id="juryDuration" name="juryDuration" min="30" max="60" value="42" required>
+                <div class="helper-text">Standaard 42 minuten</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bufferTime">Buffer Tijd (minuten)</label>
+                <input type="number" id="bufferTime" name="bufferTime" min="10" max="60" value="30" required>
+                <div class="helper-text">Minimale tijd tussen activiteiten</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="breakEnabled">Pauze Inschakelen</label>
+                <select id="breakEnabled" name="breakEnabled" required>
+                    <option value="true">Ja</option>
+                    <option value="false">Nee</option>
+                </select>
+                <div class="helper-text">30 minuten pauze na 2u48</div>
             </div>
             
             <button type="submit" id="submitBtn">🚀 Genereer Schema</button>

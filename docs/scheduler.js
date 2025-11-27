@@ -10,7 +10,11 @@ document.getElementById('schedulerForm').addEventListener('submit', async (e) =>
         num_tables: document.getElementById('numTables').value,
         num_jury_rooms: document.getElementById('numJuryRooms').value,
         matches_per_team: document.getElementById('matchesPerTeam').value,
-        num_timeslots: document.getElementById('numTimeslots').value
+        num_timeslots: document.getElementById('numTimeslots').value,
+        match_duration: document.getElementById('matchDuration').value,
+        jury_duration: document.getElementById('juryDuration').value,
+        buffer_time: document.getElementById('bufferTime').value,
+        break_enabled: document.getElementById('breakEnabled').value
     };
     
     createIssue(formData);
@@ -29,6 +33,10 @@ function createIssue(params) {
 - **Jury Rooms:** ${params.num_jury_rooms}
 - **Wedstrijden per team:** ${params.matches_per_team}
 - **Tijdsloten:** ${params.num_timeslots}
+- **Wedstrijd duur:** ${params.match_duration} min
+- **Jury duur:** ${params.jury_duration} min
+- **Buffer tijd:** ${params.buffer_time} min
+- **Pauze:** ${params.break_enabled === 'true' ? 'Ja' : 'Nee'}
 
 ---
 ⚙️ *Een GitHub Actions workflow zal automatisch starten om dit schema te genereren.*
