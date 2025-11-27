@@ -229,11 +229,23 @@
                     <option value="true">Ja</option>
                     <option value="false">Nee</option>
                 </select>
-                <div class="helper-text">30 minuten pauze na 2u48</div>
+                <div class="helper-text">Pauze aan of uit</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="breakStartTime">Pauze Start Tijd (minuten)</label>
+                <input type="number" id="breakStartTime" name="breakStartTime" min="0" max="500" value="168" required>
+                <div class="helper-text">Start van de pauze in minuten (168 = 2u48)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="breakDuration">Pauze Duur (minuten)</label>
+                <input type="number" id="breakDuration" name="breakDuration" min="0" max="120" value="35" required>
+                <div class="helper-text">Duur van de pauze in minuten</div>
             </div>
             
             <button type="submit" id="submitBtn">🚀 Genereer Schema</button>
-        </form>
+```        </form>
         
         <div id="status" class="status"></div>
     </div>

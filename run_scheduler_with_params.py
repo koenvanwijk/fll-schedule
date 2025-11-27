@@ -17,6 +17,8 @@ def main():
     parser.add_argument('--jury-duration', type=int, help='Jury sessie duur in minuten')
     parser.add_argument('--buffer-time', type=int, help='Buffer tijd tussen activiteiten')
     parser.add_argument('--break-enabled', type=str, help='Pauze inschakelen (Ja/Nee)')
+    parser.add_argument('--break-start-time', type=int, help='Pauze start tijd in minuten')
+    parser.add_argument('--break-duration', type=int, help='Pauze duur in minuten')
     
     args = parser.parse_args()
     
@@ -43,6 +45,10 @@ def main():
         config.MINIMUM_BUFFER_TIME = args.buffer_time
     if args.break_enabled is not None:
         config.BREAK_ENABLED = args.break_enabled.lower() in ['ja', 'yes', 'true', '1']
+    if args.break_start_time is not None:
+        config.BREAK_START_TIME = args.break_start_time
+    if args.break_duration is not None:
+        config.BREAK_DURATION = args.break_duration
     
     # Now run the scheduler
     from complete_scheduler import create_complete_schedule, build_json_output, print_summary, save_json

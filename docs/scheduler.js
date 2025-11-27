@@ -15,7 +15,9 @@ document.getElementById('schedulerForm').addEventListener('submit', async (e) =>
         match_duration: document.getElementById('matchDuration').value,
         jury_duration: document.getElementById('juryDuration').value,
         buffer_time: document.getElementById('bufferTime').value,
-        break_enabled: document.getElementById('breakEnabled').value === 'true' ? 'Ja' : 'Nee'
+        break_enabled: document.getElementById('breakEnabled').value === 'true' ? 'Ja' : 'Nee',
+        break_start_time: document.getElementById('breakStartTime').value,
+        break_duration: document.getElementById('breakDuration').value
     };
     
     console.log('Form data:', formData);
@@ -37,7 +39,9 @@ function createIssue(params) {
 **Wedstrijd duur:** ${params.match_duration} min
 **Jury duur:** ${params.jury_duration} min
 **Buffer tijd:** ${params.buffer_time} min
-**Pauze:** ${params.break_enabled}`;
+**Pauze:** ${params.break_enabled}
+**Pauze start:** ${params.break_start_time} min
+**Pauze duur:** ${params.break_duration} min`;
 
     // URL encode the title and body
     const encodedTitle = encodeURIComponent(issueTitle);

@@ -45,6 +45,8 @@ jobs:
         JURY_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Jury duur:\*\* )\d+' || echo "42")
         BUFFER=$(echo "$BODY" | grep -oP '(?<=\*\*Buffer tijd:\*\* )\d+' || echo "30")
         BREAK=$(echo "$BODY" | grep -oP '(?<=\*\*Pauze:\*\* )(Ja|Nee)' || echo "Ja")
+        BREAK_START=$(echo "$BODY" | grep -oP '(?<=\*\*Pauze start:\*\* )\d+' || echo "168")
+        BREAK_DUR=$(echo "$BODY" | grep -oP '(?<=\*\*Pauze duur:\*\* )\d+' || echo "35")
         
         echo "num_teams=$NUM_TEAMS" >> $GITHUB_OUTPUT
         echo "num_tables=$NUM_TABLES" >> $GITHUB_OUTPUT
@@ -56,6 +58,8 @@ jobs:
         echo "jury_duration=$JURY_DUR" >> $GITHUB_OUTPUT
         echo "buffer_time=$BUFFER" >> $GITHUB_OUTPUT
         echo "break_enabled=$BREAK" >> $GITHUB_OUTPUT
+        echo "break_start_time=$BREAK_START" >> $GITHUB_OUTPUT
+        echo "break_duration=$BREAK_DUR" >> $GITHUB_OUTPUT
         
         echo "Parsed parameters:"
         echo "Teams: $NUM_TEAMS"
@@ -68,6 +72,8 @@ jobs:
         echo "Jury Duration: $JURY_DUR"
         echo "Buffer: $BUFFER"
         echo "Break: $BREAK"
+        echo "Break Start: $BREAK_START"
+        echo "Break Duration: $BREAK_DUR"
     
     - name: Add comment - Starting
       uses: actions/github-script@v7
@@ -103,7 +109,9 @@ jobs:
           --match-duration "${{ steps.params.outputs.match_duration }}" \
           --jury-duration "${{ steps.params.outputs.jury_duration }}" \
           --buffer-time "${{ steps.params.outputs.buffer_time }}" \
-          --break-enabled "${{ steps.params.outputs.break_enabled }}"
+          --break-enabled "${{ steps.params.outputs.break_enabled }}" \
+          --break-start-time "${{ steps.params.outputs.break_start_time }}" \
+          --break-duration "${{ steps.params.outputs.break_duration }}"
       continue-on-error: true
     
     - name: Find generated schedule

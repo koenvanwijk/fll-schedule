@@ -60,6 +60,16 @@ on:
         options:
           - 'Ja'
           - 'Nee'
+      break_start_time:
+        description: 'Pauze start tijd (minuten)'
+        required: true
+        default: '168'
+        type: string
+      break_duration:
+        description: 'Pauze duur (minuten)'
+        required: true
+        default: '35'
+        type: string
 
 jobs:
   generate-and-test:
@@ -91,7 +101,9 @@ jobs:
           --match-duration "${{ github.event.inputs.match_duration || '7' }}" \
           --jury-duration "${{ github.event.inputs.jury_duration || '42' }}" \
           --buffer-time "${{ github.event.inputs.buffer_time || '30' }}" \
-          --break-enabled "${{ github.event.inputs.break_enabled || 'Ja' }}"
+          --break-enabled "${{ github.event.inputs.break_enabled || 'Ja' }}" \
+          --break-start-time "${{ github.event.inputs.break_start_time || '168' }}" \
+          --break-duration "${{ github.event.inputs.break_duration || '35' }}"
       continue-on-error: false
     
     - name: Find generated schedule
