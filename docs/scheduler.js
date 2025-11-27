@@ -22,27 +22,20 @@ document.getElementById('schedulerForm').addEventListener('submit', async (e) =>
 });
 
 function createIssue(params) {
-    // Create issue body with parameters
-    const issueTitle = `Schema Request: ${params.num_teams} teams, ${params.num_tables} tafels`;
+    // Create issue body with parameters - compact format to avoid URL length limits
+    const issueTitle = `Schema: ${params.num_teams}T ${params.num_tables}Taf ${params.matches_per_team}W`;
     const issueBody = `## Toernooi Configuratie
 
-**Automatisch gegenereerd via web interface**
-
-### Parameters
-- **Teams:** ${params.num_teams}
-- **Tafels:** ${params.num_tables}  
-- **Jury Rooms:** ${params.num_jury_rooms}
-- **Wedstrijden per team:** ${params.matches_per_team}
-- **Tijdsloten:** ${params.num_timeslots}
-- **Start tijd:** ${params.start_time}
-- **Wedstrijd duur:** ${params.match_duration} min
-- **Jury duur:** ${params.jury_duration} min
-- **Buffer tijd:** ${params.buffer_time} min
-- **Pauze:** ${params.break_enabled}
-
----
-⚙️ *Een GitHub Actions workflow zal automatisch starten om dit schema te genereren.*
-📥 *Het resultaat wordt als artifact toegevoegd aan deze issue.*`;
+**Teams:** ${params.num_teams}
+**Tafels:** ${params.num_tables}
+**Jury Rooms:** ${params.num_jury_rooms}
+**Wedstrijden per team:** ${params.matches_per_team}
+**Tijdsloten:** ${params.num_timeslots}
+**Start tijd:** ${params.start_time}
+**Wedstrijd duur:** ${params.match_duration} min
+**Jury duur:** ${params.jury_duration} min
+**Buffer tijd:** ${params.buffer_time} min
+**Pauze:** ${params.break_enabled}`;
 
     // URL encode the title and body
     const encodedTitle = encodeURIComponent(issueTitle);
@@ -50,6 +43,11 @@ function createIssue(params) {
     
     // Create GitHub issue URL (without labels - wordt automatisch toegevoegd)
     const issueUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?title=${encodedTitle}&body=${encodedBody}`;
+    
+    // Debug: log de URL lengte en body
+    console.log('Issue URL length:', issueUrl.length);
+    console.log('Issue body:', issueBody);
+    console.log('Full URL:', issueUrl);
     
     // Show success message with link
     const statusDiv = document.getElementById('status');
