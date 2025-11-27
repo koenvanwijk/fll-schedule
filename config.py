@@ -15,7 +15,7 @@ NUM_JURY_ROOMS = 8
 NUM_TEAMS = 40
 
 # Aantal wedstrijden per team (standaard 4 voor FLL)
-MATCHES_PER_TEAM = 5
+MATCHES_PER_TEAM = 4
 
 # Duur van een wedstrijd in minuten
 MATCH_DURATION = 7
@@ -55,13 +55,8 @@ JURY_SESSIONS_PER_TEAM = 1
 
 # ===== TIMING INSTELLINGEN =====
 
-
 # Start tijd van het toernooi
 START_TIME = "09:30"
-
-# Pauze instellingen (optioneel)
-BREAK_START_TIME = 168  # minuten na start
-BREAK_DURATION = 30  # minuten
 
 # Maximale oplostijd in seconden
 MAX_SOLVE_TIME = 120
