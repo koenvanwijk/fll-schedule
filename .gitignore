@@ -28,3 +28,4 @@ Thumbs.db
 
 # Conda
 .conda/
+schedule*.json

@@ -27,6 +27,14 @@ JURY_DURATION = 42
 # Minimale buffer tijd tussen activiteiten in minuten
 MINIMUM_BUFFER_TIME = 30
 
+# ===== PAUZE INSTELLINGEN =====
+
+# Pauze tijdens het toernooi - wordt toegevoegd in de OUTPUT, niet als constraint
+BREAK_ENABLED = True  # Zet op False om pauze uit te schakelen
+BREAK_START_TIME = 168  # Start tijd van pauze in minuten (168 min = 2u48)
+BREAK_DURATION = 30  # Duur van de pauze in minuten
+# Alle activiteiten NA break_start_time krijgen +BREAK_DURATION minuten in de output
+
 # Tafel paren: deze tafels spelen samen (beide bezet of beide leeg)
 # Format: lijst van tuples met tafel IDs (0-indexed)
 TABLE_PAIRS = [

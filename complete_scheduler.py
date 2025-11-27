@@ -249,6 +249,7 @@ def create_complete_schedule():
                     pair_violations.append(pair_mismatch)
     
     # Preferentie: teams spelen op zo min mogelijk verschillende tafels
+    # Dit zorgt voor consistentie in tegenstanders
     tables_used = {}
     for team in all_teams:
         for table in all_tables:
@@ -258,15 +259,15 @@ def create_complete_schedule():
             model.add(sum(team_matches_on_table) == 0).only_enforce_if(tables_used[(team, table)].Not())
 
     # Gecombineerde optimalisatie doelen:
-    # 1. Minimaliseer aantal verschillende tafels per team (hogere prioriteit)
-    # 2. Minimaliseer tafel paar violations (lagere prioriteit)
+    # 1. HOOGSTE PRIORITEIT: Minimaliseer tafel paar violations (cost 1000)
+    # 2. TWEEDE PRIORITEIT: Minimaliseer aantal verschillende tafels per team (cost 1)
     total_tables_used = sum(tables_used[(team, table)] for team in all_teams for table in all_tables)
     
     if 'pair_violations' in locals() and pair_violations:
-        # Weeg tafel spreiding zwaarder dan paar violations
-        # Elk extra tafel per team kost 100, elke paar violation kost 1
-        model.minimize(total_tables_used * 100 + sum(pair_violations))
+        # Tafel paren zijn VEEL belangrijker (cost 1000), dan pas tafel spreiding (cost 1)
+        model.minimize(sum(pair_violations) * 1000 + total_tables_used)
     else:
+        # Alleen tafel spreiding minimaliseren
         model.minimize(total_tables_used)
 
     # ===== OPLOSSEN =====
@@ -302,6 +303,13 @@ def build_json_output(result):
     solver = result['solver']
     matches = result['matches']
     jury_sessions = result['jury_sessions']
+    
+    # Hulp functie: voeg pauze toe aan tijden na BREAK_START_TIME
+    def adjust_time_for_break(time_minutes):
+        """Voegt BREAK_DURATION toe aan tijden die na de pauze vallen"""
+        if BREAK_ENABLED and time_minutes >= BREAK_START_TIME:
+            return time_minutes + BREAK_DURATION
+        return time_minutes
     
     output = {
         "constraintConfiguration": {
@@ -349,17 +357,20 @@ def build_json_output(result):
     table_timeslot_id = 0
     for ts in range(NUM_TIMESLOTS):
         start_time_minutes = ts * MATCH_DURATION
+        adjusted_start = adjust_time_for_break(start_time_minutes)
+        adjusted_end = adjust_time_for_break(start_time_minutes + MATCH_DURATION)
+        
         for table_id in range(NUM_TABLES):
             pair_id = table_id // 2
             output["tableTimeslotList"].append({
                 "id": table_timeslot_id,
-                "startTime": start_time_minutes,
+                "startTime": adjusted_start,
                 "duration": MATCH_DURATION,
                 "table": {
                     "id": table_id,
                     "tablePair": {"id": pair_id}
                 },
-                "endTime": start_time_minutes + MATCH_DURATION
+                "endTime": adjusted_end
             })
             table_timeslot_id += 1
     
@@ -374,12 +385,15 @@ def build_json_output(result):
     # Maak jury timeslots die gebaseerd zijn op match timing
     for ts in range(NUM_TIMESLOTS):
         start_time_minutes = ts * MATCH_DURATION  # Zelfde tijdschaal als matches!
+        adjusted_start = adjust_time_for_break(start_time_minutes)
+        adjusted_end = adjust_time_for_break(start_time_minutes + JURY_DURATION)
+        
         for jury_id in range(NUM_JURY_ROOMS):
             output["juryTimeslotList"].append({
                 "id": jury_timeslot_id,
-                "startTime": start_time_minutes,
+                "startTime": adjusted_start,
                 "duration": JURY_DURATION,
-                "endTime": start_time_minutes + JURY_DURATION,
+                "endTime": adjusted_end,
                 "jury": {"id": jury_id}
             })
             jury_timeslot_id += 1
