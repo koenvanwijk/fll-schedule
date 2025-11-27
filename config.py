@@ -9,7 +9,7 @@ Pas deze waarden aan voor jouw specifieke toernooi
 NUM_TABLES = 6
 
 # Aantal jury rooms beschikbaar (4-10)
-NUM_JURY_ROOMS = 7
+NUM_JURY_ROOMS = 8
 
 # Aantal teams (10-40)
 NUM_TEAMS = 40
@@ -27,6 +27,13 @@ JURY_DURATION = 42
 # Minimale buffer tijd tussen activiteiten in minuten
 MINIMUM_BUFFER_TIME = 30
 
+# Tafel paren: deze tafels spelen samen (beide bezet of beide leeg)
+# Format: lijst van tuples met tafel IDs (0-indexed)
+TABLE_PAIRS = [
+    (0, 1),  # Tafel 1 en 2
+    (2, 3),  # Tafel 3 en 4
+    (4, 5),  # Tafel 5 en 6
+]
 
 # Aantal tijdsloten (auto-berekend of handmatig instellen)
 NUM_TIMESLOTS = 40  # Verhoog dit als er geen oplossing gevonden wordt

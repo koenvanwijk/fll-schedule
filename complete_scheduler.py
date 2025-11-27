@@ -132,6 +132,30 @@ def create_complete_schedule():
     for team in all_teams:
         for ts in all_jury_timeslots:
             model.add_at_most_one(jury_sessions[(team, ts, jr)] for jr in all_jury_rooms)
+    
+    # 6b. NIEUWE CONSTRAINT: Jury sessies beginnen in synchrone rondes
+    # Bereken hoeveel rondes nodig zijn (40 teams / 7 rooms = 6 rondes)
+    import math
+    num_jury_rounds = math.ceil(NUM_TEAMS / NUM_JURY_ROOMS)
+    print(f"   └─ Jury rondes: {num_jury_rounds} (max {NUM_JURY_ROOMS} teams per ronde)")
+    
+    # Definieer welke tijdsloten gebruikt mogen worden voor jury start (beperkt aantal)
+    # Jury sessies mogen alleen starten op tijdslot 0, 7, 14, 21, etc. (elke 7 slots = 49 min)
+    # Dit geeft genoeg tijd tussen rondes (49 min > 42 min jury + minimale gap)
+    allowed_jury_start_slots = list(range(0, NUM_TIMESLOTS, 7))[:num_jury_rounds]
+    
+    # Elk team mag alleen een jury sessie starten op deze specifieke tijdsloten
+    for team in all_teams:
+        # Tel hoeveel jury sessies het team heeft op toegestane tijdsloten
+        valid_jury_sessions = []
+        for ts in allowed_jury_start_slots:
+            for jr in all_jury_rooms:
+                if (team, ts, jr) in jury_sessions:
+                    valid_jury_sessions.append(jury_sessions[(team, ts, jr)])
+        
+        # Team moet precies 1 jury sessie hebben op een toegestaan tijdslot
+        if valid_jury_sessions:
+            model.add(sum(valid_jury_sessions) == 1)
 
     # ===== CONSTRAINTS VOOR OVERLAP EN BUFFER =====
     
@@ -196,6 +220,34 @@ def create_complete_schedule():
 
     # ===== OPTIMALISATIE =====
     
+    # Soft constraint: tafel paren zo vaak mogelijk beide bezet of beide leeg
+    if 'TABLE_PAIRS' in globals() and TABLE_PAIRS:
+        print("   └─ Tafel paren optimalisatie...")
+        pair_violations = []
+        
+        for table1, table2 in TABLE_PAIRS:
+            if table1 < NUM_TABLES and table2 < NUM_TABLES:
+                for ts in all_match_timeslots:
+                    # Check of tafel1 en tafel2 beide bezet zijn of beide leeg
+                    table1_used = model.new_bool_var(f'ts{ts}_tb{table1}_used')
+                    table2_used = model.new_bool_var(f'ts{ts}_tb{table2}_used')
+                    
+                    # table1_used = 1 als er een team op tafel1 speelt op tijdslot ts
+                    model.add(sum(matches[(team, ts, table1)] for team in all_teams) >= 1).only_enforce_if(table1_used)
+                    model.add(sum(matches[(team, ts, table1)] for team in all_teams) == 0).only_enforce_if(table1_used.Not())
+                    
+                    # table2_used = 1 als er een team op tafel2 speelt op tijdslot ts
+                    model.add(sum(matches[(team, ts, table2)] for team in all_teams) >= 1).only_enforce_if(table2_used)
+                    model.add(sum(matches[(team, ts, table2)] for team in all_teams) == 0).only_enforce_if(table2_used.Not())
+                    
+                    # Violation: XOR van table1_used en table2_used (1 als ze verschillend zijn)
+                    pair_mismatch = model.new_bool_var(f'ts{ts}_pair{table1}_{table2}_mismatch')
+                    # pair_mismatch = 1 als table1_used != table2_used
+                    model.add(table1_used + table2_used == 1).only_enforce_if(pair_mismatch)
+                    model.add(table1_used == table2_used).only_enforce_if(pair_mismatch.Not())
+                    
+                    pair_violations.append(pair_mismatch)
+    
     # Preferentie: teams spelen op zo min mogelijk verschillende tafels
     tables_used = {}
     for team in all_teams:
@@ -205,8 +257,17 @@ def create_complete_schedule():
             model.add(sum(team_matches_on_table) >= 1).only_enforce_if(tables_used[(team, table)])
             model.add(sum(team_matches_on_table) == 0).only_enforce_if(tables_used[(team, table)].Not())
 
-    # Minimaliseer totaal aantal verschillende tafels gebruikt door teams
-    model.minimize(sum(tables_used[(team, table)] for team in all_teams for table in all_tables))
+    # Gecombineerde optimalisatie doelen:
+    # 1. Minimaliseer aantal verschillende tafels per team (hogere prioriteit)
+    # 2. Minimaliseer tafel paar violations (lagere prioriteit)
+    total_tables_used = sum(tables_used[(team, table)] for team in all_teams for table in all_tables)
+    
+    if 'pair_violations' in locals() and pair_violations:
+        # Weeg tafel spreiding zwaarder dan paar violations
+        # Elk extra tafel per team kost 100, elke paar violation kost 1
+        model.minimize(total_tables_used * 100 + sum(pair_violations))
+    else:
+        model.minimize(total_tables_used)
 
     # ===== OPLOSSEN =====
     

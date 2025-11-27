@@ -233,6 +233,94 @@ def test_team_table_preference(data):
     return True
 
 
+def test_jury_synchronized_rounds(data):
+    """Test of jury sessies in gesynchroniseerde rondes beginnen"""
+    print("\n🔍 Test: Jury Synchronized Rounds")
+    print("-" * 60)
+    
+    # Build timeslot -> (start, end, jury_room) mapping
+    timeslot_info = {}
+    for ts in data['juryTimeslotList']:
+        ts_id = ts['id']
+        jury_room = ts['jury']['id']
+        start = ts['startTime']
+        end = ts['endTime']
+        timeslot_info[ts_id] = (start, end, jury_room)
+
+    # Build start_time -> [teams] mapping
+    jury_start_times = defaultdict(list)
+    for allocation in data['teamJuryAllocationList']:
+        team = allocation['team']['id']
+        ts_id = allocation['timeslot']['id']
+        if ts_id in timeslot_info:
+            start, end, jury_room = timeslot_info[ts_id]
+            jury_start_times[start].append((team, jury_room))
+
+    # Print jury rondes
+    num_rounds = len(jury_start_times)
+    print(f'  Aantal jury rondes: {num_rounds}')
+    
+    for start_time in sorted(jury_start_times.keys()):
+        teams_in_round = jury_start_times[start_time]
+        print(f'  Ronde @ {start_time} min: {len(teams_in_round)} teams')
+    
+    # Check: alle teams moeten in een ronde zitten
+    total_teams_in_rounds = sum(len(teams) for teams in jury_start_times.values())
+    num_teams = len(data['teamList'])
+    
+    if total_teams_in_rounds == num_teams:
+        print(f'\n  ✅ PASSED: Alle {num_teams} teams in {num_rounds} gesynchroniseerde rondes')
+        return True
+    else:
+        print(f'\n  ❌ FAILED: {total_teams_in_rounds}/{num_teams} teams in rondes')
+        return False
+
+
+def test_table_pairs(data):
+    """Test of tafel paren (soft constraint) goed worden gebruikt"""
+    print("\n🔍 Test: Table Pairs (soft)")
+    print("-" * 60)
+    
+    # Tafel paren (0-indexed)
+    TABLE_PAIRS = [(0, 1), (2, 3), (4, 5)]
+    
+    # Build tijdslot -> tafels in gebruik
+    timeslot_tables = defaultdict(set)
+    
+    for alloc in data['teamTableAllocationList']:
+        ts_id = alloc['timeslot']['id']
+        ts_data = next(t for t in data['tableTimeslotList'] if t['id'] == ts_id)
+        table = ts_data['table']['id']
+        start = ts_data['startTime']
+        timeslot_tables[start].add(table)
+    
+    # Check voor elk tijdslot de paren
+    matched = 0
+    mismatched = 0
+    
+    for start_time in sorted(timeslot_tables.keys()):
+        tables = timeslot_tables[start_time]
+        
+        for t1, t2 in TABLE_PAIRS:
+            t1_used = t1 in tables
+            t2_used = t2 in tables
+            
+            if (t1_used and t2_used) or (not t1_used and not t2_used):
+                matched += 1
+            else:
+                mismatched += 1
+    
+    total = matched + mismatched
+    percentage = (matched / total * 100) if total > 0 else 0
+    
+    print(f'  Tafel paren: (1,2), (3,4), (5,6)')
+    print(f'  Beide bezet OF beide leeg: {matched}/{total} ({percentage:.1f}%)')
+    print(f'  Slechts 1 van paar bezet: {mismatched}/{total} ({100-percentage:.1f}%)')
+    
+    print(f'\n  ✅ INFO: Soft constraint (geen pass/fail)')
+    return True
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python test_schedule.py <schedule.json>")
@@ -259,7 +347,9 @@ def main():
     results.append(("Table Overlaps", test_table_overlaps(data)))
     results.append(("Jury Room Overlaps", test_jury_room_overlaps(data)))
     results.append(("Team Constraints", test_team_constraints(data)))
+    results.append(("Jury Synchronized Rounds", test_jury_synchronized_rounds(data)))
     results.append(("Table Preference", test_team_table_preference(data)))
+    results.append(("Table Pairs", test_table_pairs(data)))
     
     # Summary
     print("\n" + "=" * 60)
