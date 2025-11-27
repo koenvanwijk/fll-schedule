@@ -38,7 +38,7 @@ function createIssue(params) {
 - **Wedstrijd duur:** ${params.match_duration} min
 - **Jury duur:** ${params.jury_duration} min
 - **Buffer tijd:** ${params.buffer_time} min
-- **Pauze:** ${params.break_enabled === 'true' ? 'Ja' : 'Nee'}
+- **Pauze:** ${params.break_enabled}
 
 ---
 ⚙️ *Een GitHub Actions workflow zal automatisch starten om dit schema te genereren.*
